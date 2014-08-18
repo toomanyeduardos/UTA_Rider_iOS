@@ -37,6 +37,8 @@
 		A053B5B018F3983300ED115A /* icon120.png in Resources */ = {isa = PBXBuildFile; fileRef = A053B5AF18F3983300ED115A /* icon120.png */; };
 		A057C46518EE48060086534B /* Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = A057C46418EE48060086534B /* Utilities.m */; };
 		A057C46818EE4AF70086534B /* Stop.m in Sources */ = {isa = PBXBuildFile; fileRef = A057C46718EE4AF70086534B /* Stop.m */; };
+		A05AA54E19A28862005C78A0 /* routes.csv in Resources */ = {isa = PBXBuildFile; fileRef = A05AA54D19A28862005C78A0 /* routes.csv */; };
+		A05AA55019A28940005C78A0 /* stops.csv in Resources */ = {isa = PBXBuildFile; fileRef = A05AA54F19A28940005C78A0 /* stops.csv */; };
 		A0710C3118F1DF1500A624F7 /* VehicleFromAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = A0710C3018F1DF1500A624F7 /* VehicleFromAPI.m */; };
 		A0712EF218FF26EF00B90196 /* TwitterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A0712EF118FF26EF00B90196 /* TwitterViewController.m */; };
 		A0712EF518FF308D00B90196 /* TwitterCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A0712EF418FF308D00B90196 /* TwitterCustomCell.m */; };
@@ -72,8 +74,6 @@
 		A08C132D18FD88B2003CD7CE /* BAVPlistNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A08C131E18FD88B2003CD7CE /* BAVPlistNode.m */; };
 		A08C132E18FD88B2003CD7CE /* JSONSyntaxHighlight.m in Sources */ = {isa = PBXBuildFile; fileRef = A08C132018FD88B2003CD7CE /* JSONSyntaxHighlight.m */; };
 		A08C132F18FD88B2003CD7CE /* STHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = A08C132218FD88B2003CD7CE /* STHTTPRequest.m */; };
-		A08C133618FD9212003CD7CE /* routes.csv in Resources */ = {isa = PBXBuildFile; fileRef = A08C133318FD9212003CD7CE /* routes.csv */; };
-		A08C133718FD9212003CD7CE /* stops.csv in Resources */ = {isa = PBXBuildFile; fileRef = A08C133418FD9212003CD7CE /* stops.csv */; };
 		A08C133818FD9212003CD7CE /* trips.csv in Resources */ = {isa = PBXBuildFile; fileRef = A08C133518FD9212003CD7CE /* trips.csv */; };
 		A08C133B18FD9306003CD7CE /* twitter.png in Resources */ = {isa = PBXBuildFile; fileRef = A08C133918FD9306003CD7CE /* twitter.png */; };
 		A08C133C18FD9306003CD7CE /* twitter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A08C133A18FD9306003CD7CE /* twitter@2x.png */; };
@@ -137,6 +137,8 @@
 		A057C46418EE48060086534B /* Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utilities.m; sourceTree = "<group>"; };
 		A057C46618EE4AF70086534B /* Stop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stop.h; sourceTree = "<group>"; };
 		A057C46718EE4AF70086534B /* Stop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Stop.m; sourceTree = "<group>"; };
+		A05AA54D19A28862005C78A0 /* routes.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = routes.csv; sourceTree = "<group>"; };
+		A05AA54F19A28940005C78A0 /* stops.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stops.csv; sourceTree = "<group>"; };
 		A0710C2F18F1DF1500A624F7 /* VehicleFromAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VehicleFromAPI.h; sourceTree = "<group>"; };
 		A0710C3018F1DF1500A624F7 /* VehicleFromAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VehicleFromAPI.m; sourceTree = "<group>"; };
 		A0712EF018FF26EF00B90196 /* TwitterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterViewController.h; sourceTree = "<group>"; };
@@ -196,8 +198,6 @@
 		A08C132018FD88B2003CD7CE /* JSONSyntaxHighlight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONSyntaxHighlight.m; sourceTree = "<group>"; };
 		A08C132118FD88B2003CD7CE /* STHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STHTTPRequest.h; sourceTree = "<group>"; };
 		A08C132218FD88B2003CD7CE /* STHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STHTTPRequest.m; sourceTree = "<group>"; };
-		A08C133318FD9212003CD7CE /* routes.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = routes.csv; sourceTree = "<group>"; };
-		A08C133418FD9212003CD7CE /* stops.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stops.csv; sourceTree = "<group>"; };
 		A08C133518FD9212003CD7CE /* trips.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = trips.csv; sourceTree = "<group>"; };
 		A08C133918FD9306003CD7CE /* twitter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = twitter.png; sourceTree = "<group>"; };
 		A08C133A18FD9306003CD7CE /* twitter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "twitter@2x.png"; sourceTree = "<group>"; };
@@ -344,8 +344,8 @@
 		A03A862118B867A500CF80D8 /* FilesFromUTA */ = {
 			isa = PBXGroup;
 			children = (
-				A08C133318FD9212003CD7CE /* routes.csv */,
-				A08C133418FD9212003CD7CE /* stops.csv */,
+				A05AA54F19A28940005C78A0 /* stops.csv */,
+				A05AA54D19A28862005C78A0 /* routes.csv */,
 				A08C133518FD9212003CD7CE /* trips.csv */,
 				A01CE6B018F204BF001D575C /* SampleData */,
 			);
@@ -532,6 +532,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A05AA54E19A28862005C78A0 /* routes.csv in Resources */,
 				A053B5B018F3983300ED115A /* icon120.png in Resources */,
 				A07ECFCA18EBBAE10087B46C /* train_blue.png in Resources */,
 				A07ECFC618EBBAE10087B46C /* map-pin-area-white.png in Resources */,
@@ -544,7 +545,6 @@
 				A07ECFCB18EBBAE10087B46C /* train_green.png in Resources */,
 				A07ECFCC18EBBAE10087B46C /* train_red.png in Resources */,
 				A08C133B18FD9306003CD7CE /* twitter.png in Resources */,
-				A08C133618FD9212003CD7CE /* routes.csv in Resources */,
 				A07ECFC718EBBAE10087B46C /* map-pin-area-white@2x.png in Resources */,
 				A01CE6B118F204BF001D575C /* SampleData in Resources */,
 				A07ECFC818EBBAE10087B46C /* text-list-white.png in Resources */,
@@ -559,8 +559,8 @@
 				A07ECFC518EBBAE10087B46C /* gear-multiple-white@2x.png in Resources */,
 				A01CE6AF18F1FCFA001D575C /* SimulatedLocations.gpx in Resources */,
 				A07ECFC218EBBAE10087B46C /* frontrunner_north.png in Resources */,
-				A08C133718FD9212003CD7CE /* stops.csv in Resources */,
 				A07ECFC318EBBAE10087B46C /* frontrunner_south.png in Resources */,
+				A05AA55019A28940005C78A0 /* stops.csv in Resources */,
 				A0712EF818FF326700B90196 /* TwitterBlack.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -756,8 +756,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Eduardo Flores (3569Q45YR7)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Eduardo Flores (3569Q45YR7)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Eduardo Flores (NHJ9WCNN2Z)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Eduardo Flores (NHJ9WCNN2Z)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "UTA_Rider/UTA_Rider-Prefix.pch";
 				INFOPLIST_FILE = "UTA_Rider/UTA_Rider-Info.plist";
