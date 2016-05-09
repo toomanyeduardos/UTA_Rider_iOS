@@ -7,27 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
+#import "BaseRoutesTVC.h"
 
-@interface RoutesTableViewController : UITableViewController <CLLocationManagerDelegate>
-{
-    // Location variables
-    CLLocationManager *locationManager;
-    CLGeocoder *geocoder;
-    CLPlacemark *placemark;
-    
-    NSUserDefaults *defaults;
-    
-    NSMutableArray *allRoutes;
-    NSMutableArray *arrayOfRoutesEnabled;
-    
-    NSMutableArray *allStops;
-    
-    NSMutableArray *routes_trax;
-    NSMutableArray *routes_bus;
-    NSMutableArray *routes_frontrunner;
-}
+@interface RoutesTableViewController : BaseRoutesTVC
 
-- (IBAction)switchEnableRoute:(id)sender;
+- (IBAction)onFavoriteSelected:(id)sender;
 
 @end

@@ -9,16 +9,12 @@
 #import <Foundation/Foundation.h>
 
 @interface Route : NSObject <NSCoding>
-{
-    BOOL isEnabled;
-}
-
-- (void) setIsEnabled:(BOOL) value;
-- (BOOL) getIsEnabled;
 
 @property (nonatomic, strong) NSNumber *routeId;
 @property (nonatomic, copy) NSString *routeLongName;
 @property (nonatomic, copy) NSString *routeShortName;
 @property (nonatomic, strong) NSNumber *routeType;
+@property (nonatomic, assign) BOOL isFavoriteRoute;
+@property (nonatomic, assign) BOOL isEnabled;
 
 @end

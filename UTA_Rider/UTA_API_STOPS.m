@@ -28,6 +28,8 @@
 
 @implementation UTA_API_STOPS
 
+@synthesize lineRef_arr, estimatedDepartureTime, directionRef, direction, publishedLineName;
+
 - (NSData *)getStopMonitorForStopId: (NSString *)stopId
 {
     
@@ -56,9 +58,6 @@
          if ([data length] > 0 && error == nil)
          {
              stopMonitoringData = data;
-             NSString *test = [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
-             NSLog(@"test = %@", test);
-             //NSLog(@"data = %@", data);
          }
          else if ([data length] == 0 && error == nil)
          {
@@ -77,6 +76,89 @@
     
     return stopMonitoringData;
 }//end getStopMonitorForStopId
+
+- (void)parseStopMonitorData:(NSData *)data
+{
+    NSXMLParser *xmlParser = [[NSXMLParser alloc] initWithData:data];
+    [xmlParser setDelegate:self];
+    [xmlParser setShouldProcessNamespaces:NO];
+    [xmlParser setShouldReportNamespacePrefixes:NO];
+    [xmlParser setShouldResolveExternalEntities:NO];
+    [xmlParser parse];
+}//end parseStopMonitorData
+
+- (void)parserDidStartDocument:(NSXMLParser *)parser
+{
+    //NSLog(@"Document started", nil);
+    depth = 0;
+    currentElement = nil;
+    
+    lineRef_arr = [[NSMutableArray alloc]init];
+    estimatedDepartureTime = [[NSMutableArray alloc]init];
+    directionRef = [[NSMutableArray alloc]init];
+    direction = [[NSMutableArray alloc]init];
+    publishedLineName = [[NSMutableArray alloc]init];
+}//end parserDidStartDocument
+
+- (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
+{
+    NSLog(@"Error: %@", [parseError localizedDescription]);
+}//end parseErrorOccurred
+
+- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName
+  namespaceURI:(NSString *)namespaceURI
+ qualifiedName:(NSString *)qName
+    attributes:(NSDictionary *)attributeDict
+{
+    currentElement = [elementName copy];
+    
+}//end parserDidStartElement
+
+- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName
+  namespaceURI:(NSString *)namespaceURI
+ qualifiedName:(NSString *)qName
+{
+    
+}//end parserDidEndElement
+
+- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
+{
+    //    NSLog(@"currentElement = %@", currentElement);
+    //    NSLog(@"string = %@", string);
+    
+    if ([currentElement isEqualToString:@"LineRef"])
+    {
+        [lineRef_arr addObject:string];
+    }
+    else if ([currentElement isEqualToString:@"EstimatedDepartureTime"])
+    {
+        [estimatedDepartureTime addObject:string];
+    }
+    else if ([currentElement isEqualToString:@"DirectionRef"])
+    {
+        [directionRef addObject:string];
+    }
+    else if ([currentElement isEqualToString:@"Direction"])
+    {
+        [direction addObject:string];
+    }
+    else if ([currentElement isEqualToString:@"PublishedLineName"])
+    {
+        [publishedLineName addObject:string];
+    }
+
+}//end parserFoundCharacters
+
+- (void)parserDidEndDocument:(NSXMLParser *)parser
+{
+    //NSLog(@"Document finished", nil);
+}//end parserDidEndDocument
+
+
+- (void)showCurrentDepth
+{
+    //NSLog(@"Current depth: %d", depth);
+}//end showCurrentDepth
 
 @end
 

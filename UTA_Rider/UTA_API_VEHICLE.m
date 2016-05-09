@@ -47,9 +47,7 @@
     urlAsString = [urlAsString stringByAppendingString:UTA_TOKEN];         // My token
     
     NSURL *url = [NSURL URLWithString:urlAsString];
-    
-    //NSLog(@"urlAsString = %@", urlAsString);
-    
+        
     gotData = NO;
     
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];

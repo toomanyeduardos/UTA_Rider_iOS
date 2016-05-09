@@ -1,0 +1,16 @@
+PODS:
+  - Bolts/Tasks (1.5.1)
+  - Parse (1.7.5.3):
+    - Bolts/Tasks (>= 1.2.0)
+  - STTwitter (0.2.2)
+
+DEPENDENCIES:
+  - Parse
+  - STTwitter
+
+SPEC CHECKSUMS:
+  Bolts: a12663244b1d3351c738882e71902fc74db54f64
+  Parse: 373adbb1ad2e34d383542c3b28f678c49ebe4881
+  STTwitter: eb85d8770ddb0f8989f341cf41ea875e90ac6e7f
+
+COCOAPODS: 0.39.0

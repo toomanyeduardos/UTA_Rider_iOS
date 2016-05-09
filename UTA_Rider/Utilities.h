@@ -11,5 +11,7 @@
 @interface Utilities : NSObject
 
 + (NSArray *) parseCSVFileWithFileName:(NSString *)filename fileType:(NSString *)filetype;
++ (void) reportPageOpenToAnalytics:(NSString *)nameOfViewController;
++ (void) reportRoutesEnabledToAnalytics:(NSArray *)arrayOfRoutesEnabled;
 
 @end

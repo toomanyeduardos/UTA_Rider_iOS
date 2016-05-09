@@ -19,6 +19,8 @@
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *subtitle;
 @property (nonatomic, strong) NSNumber *routeType;
+@property (nonatomic, strong) NSNumber *stop_id;
+@property (nonatomic, copy) NSString *stop_code;
 
 - initWithPosition:(CLLocationCoordinate2D) coords;
 

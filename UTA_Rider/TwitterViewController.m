@@ -10,6 +10,7 @@
 #import "STTwitterAPI.h"
 #import "Tweet.h"
 #import "TwitterCustomCell.h"
+#import "Utilities.h"
 
 #define TWITTER_KEY         @"JjppSoLTt7CDDWGegs8SWqSo6"
 #define TWITTER_SECRET      @"KogEjVNm2sztW3V3DQuMJYWRSp3Sh6PtBAvfsv6aBGOYn50c2s"
@@ -34,6 +35,13 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [Utilities reportPageOpenToAnalytics:NSStringFromClass([self class])];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -110,7 +118,13 @@
         NSString *dateStr = [df stringFromDate:date];
         
         Tweet *newTweet = [[Tweet alloc]init];
-        [newTweet setTweet_title:[tweet objectForKey:@"text"]];
+        
+        NSString *tweetText = [tweet objectForKey:@"text"];
+        if ([tweetText containsString:@"&amp;"])
+        {
+            tweetText = [tweetText stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
+        }
+        [newTweet setTweet_title:tweetText];
         [newTweet setTweet_date:dateStr];
         [newTweet setTweet_screenName:screen_name];
         [newTweet setTweet_url:url];
@@ -141,6 +155,17 @@
     cell.tweet_screenName.text = [NSString stringWithFormat:@"#%@", tweet.tweet_screenName];
     cell.tweet_text.text = tweet.tweet_title;
     cell.tweet_date.text = tweet.tweet_date;
+    
+    if ([tweet.tweet_title hasPrefix:@"@"])
+    {
+        [cell.tweet_text setTextColor:[UIColor grayColor]];
+        [cell.tweet_date setTextColor:[UIColor grayColor]];
+    }
+    else
+    {
+        [cell.tweet_text setTextColor:[UIColor blackColor]];
+        [cell.tweet_date setTextColor:[UIColor blackColor]];
+    }
     
     return cell;
 }

@@ -10,29 +10,29 @@
 	<string>UTA_Rider</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>AD7B7D84-A098-4156-BF32-051131F3A812</key>
-		<string>ssh://github.com/EduardoFlores/UTA-Rider-iOS.git</string>
+		<key>BD45CA52E4BCEBF526AD6D257B12A8542330B363</key>
+		<string>github.com:EduardoFlores/UTA-Rider-iOS.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>UTA_Rider.xcodeproj/project.xcworkspace</string>
+	<string>UTA_Rider.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>AD7B7D84-A098-4156-BF32-051131F3A812</key>
+		<key>BD45CA52E4BCEBF526AD6D257B12A8542330B363</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/EduardoFlores/UTA-Rider-iOS.git</string>
+	<string>github.com:EduardoFlores/UTA-Rider-iOS.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>AD7B7D84-A098-4156-BF32-051131F3A812</string>
+	<string>BD45CA52E4BCEBF526AD6D257B12A8542330B363</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>AD7B7D84-A098-4156-BF32-051131F3A812</string>
+			<string>BD45CA52E4BCEBF526AD6D257B12A8542330B363</string>
 			<key>IDESourceControlWCCName</key>
 			<string>UTA_Rider</string>
 		</dict>

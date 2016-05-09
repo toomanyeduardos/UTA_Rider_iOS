@@ -10,7 +10,7 @@
 
 @implementation AnnotationObject
 
-@synthesize coordinate, title, subtitle, routeType;
+@synthesize coordinate, title, subtitle, routeType, stop_id, stop_code;
 
 - initWithPosition:(CLLocationCoordinate2D)coords
 {

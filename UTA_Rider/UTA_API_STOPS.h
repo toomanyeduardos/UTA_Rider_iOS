@@ -12,8 +12,17 @@
 {
     NSData *stopMonitoringData;
     BOOL gotData;
+    NSInteger depth;
+    NSString *currentElement;
 }
 
+@property (nonatomic, retain) NSMutableArray *lineRef_arr;
+@property (nonatomic, retain) NSMutableArray *estimatedDepartureTime;
+@property (nonatomic, retain) NSMutableArray *directionRef;
+@property (nonatomic, retain) NSMutableArray *direction;
+@property (nonatomic, retain) NSMutableArray *publishedLineName;
+
 - (NSData *)getStopMonitorForStopId: (NSString *)stopId;
+- (void)parseStopMonitorData:(NSData *)data;
 
 @end

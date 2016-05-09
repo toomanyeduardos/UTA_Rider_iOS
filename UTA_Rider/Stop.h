@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Stop : NSObject
+@interface Stop : NSObject <NSCoding>
 
 @property (nonatomic, strong) NSNumber *stopId;
 @property (nonatomic, copy) NSString *stopCode;

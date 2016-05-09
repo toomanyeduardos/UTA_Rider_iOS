@@ -9,10 +9,16 @@
 #import "MapViewController.h"
 #import "AnnotationView.h"
 #import "UTA_API_VEHICLE.h"
+#import "UTA_API_STOPS.h"
 #import "Route.h"
 #import "Stop.h"
 #import "AnnotationObject.h"
 #import "VehicleFromAPI.h"
+#import "Utilities.h"
+#import "CustomButton.h"
+#import "CustomMapView.h"
+#import <QuartzCore/QuartzCore.h>
+#import "SharedKeys.h"
 
 #define SPAN_VALUE 0.05
 
@@ -56,16 +62,20 @@
         
         [self displayUserLocationOnMap];
         
-        NSData *stopsData = [defaults objectForKey:@"allStops"];
+        NSData *stopsData = [defaults objectForKey:KEY_STOPS_ALL];
         allStops = [NSKeyedUnarchiver unarchiveObjectWithData:stopsData];
-        
-        NSData *routesData = [defaults objectForKey:@"arrayOfRoutesEnabled"];
+    
+        NSData *routesData = [defaults objectForKey:KEY_ROUTES_ENABLED];
         arrayOfRoutesEnabled = [NSKeyedUnarchiver unarchiveObjectWithData:routesData];
         
+        // might change this for reports of favorites. This is reporting too much data
+        //[Utilities reportRoutesEnabledToAnalytics:arrayOfRoutesEnabled];
+
         [self generateAnnotationsForVehicles];
 
     });
     
+    [Utilities reportPageOpenToAnalytics:NSStringFromClass([self class])];
 }
 
 - (void)viewDidLoad
@@ -89,6 +99,14 @@
                                                      repeats:YES];
 }
 
+- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
+{
+    CLLocation *locationUpdated = [userLocation location];
+    
+    latitude = [locationUpdated coordinate].latitude;
+    longitude = [locationUpdated coordinate].longitude;
+}
+
 - (void) displayUserLocationOnMap
 {
     [self.mapView setDelegate:self];
@@ -104,6 +122,81 @@
     
 }
 
+- (void) mapButtonMoreInfo:(CustomButton *)sender
+{
+    CustomMapView *infoView = [[CustomMapView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width / 1.3, self.view.frame.size.height / 4)];
+    [infoView setBackgroundColor:[UIColor lightGrayColor]];
+    infoView.center = self.view.center;
+    infoView.layer.cornerRadius = 10;
+    infoView.layer.masksToBounds = YES;
+    
+    UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc]initWithFrame:CGRectMake(0, 0, infoView.frame.size.width, infoView.frame.size.height)];
+    [activityIndicator startAnimating];
+    [infoView addSubview:activityIndicator];
+    
+    UIButton *buttonExit = [[UIButton alloc]initWithFrame:CGRectMake(infoView.frame.size.width - 36, -12, 48, 48)];
+    [buttonExit setImage:[UIImage imageNamed:@"icon_x"] forState:UIControlStateNormal];
+    [buttonExit setUserInteractionEnabled:YES];
+    [buttonExit addTarget:self
+                   action:@selector(removeMapButtonInfo)
+          forControlEvents:UIControlEventTouchUpInside];
+    [infoView addSubview:buttonExit];
+    
+    [self.view addSubview:infoView];
+    
+    dispatch_queue_t downloader = dispatch_queue_create("downloader", NULL);
+    dispatch_async(downloader, ^{
+        UTA_API_STOPS *stops = [[UTA_API_STOPS alloc]init];
+        //    NSData *stopsData = [stops getStopMonitorForStopId:@"801160"];    // frontrunner
+        NSData *stopsData = [stops getStopMonitorForStopId:sender.string];
+        [stops parseStopMonitorData:stopsData];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [activityIndicator removeFromSuperview];
+            
+            NSString *infoString = @"";
+            if ([[stops lineRef_arr]count] < 1)
+            {
+                infoString = @"\nNo information for this stop at this moment. Try it again in a few minutes";
+            }
+            else
+            {
+                for (int i = 0; i < [[stops lineRef_arr]count]; i++)
+                {
+                    NSNumber *departureTimeInSeconds = [[stops estimatedDepartureTime]objectAtIndex:i];
+                    departureTimeInSeconds = @([departureTimeInSeconds intValue] / 60);
+                    infoString = [infoString stringByAppendingString:[NSString stringWithFormat:@"%@ %@ in %.0f minutes\n", [[stops publishedLineName]objectAtIndex:i],
+                                                                      [[stops direction]objectAtIndex:i],
+                                                                      round([departureTimeInSeconds doubleValue])]];
+                }
+            }
+            
+            UITextView *textView = [[UITextView alloc]initWithFrame:CGRectMake(0, 0, infoView.frame.size.width, infoView.frame.size.height)];
+            [textView setText:infoString];
+            [textView setBackgroundColor:[UIColor clearColor]];
+            [textView setTextColor:[UIColor whiteColor]];
+            [textView setFont:[UIFont fontWithName:@"Helvetica" size:14.0]];
+            [textView setSelectable:NO];
+            [textView setUserInteractionEnabled:NO];
+            [infoView addSubview:textView];
+            
+            //[NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(removeMapButtonInfo) userInfo:nil repeats:NO];
+        });
+
+    });
+}
+
+- (void) removeMapButtonInfo
+{
+    for (UIView *view in self.view.subviews)
+    {
+        if ([view isKindOfClass:[CustomMapView class]])
+        {
+            [view removeFromSuperview];
+        }
+    }
+}
+
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
 {
     if ([annotation isKindOfClass:MKUserLocation.class])
@@ -114,18 +207,39 @@
     // create view (pin)
     AnnotationView *view = [[AnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
     
+    AnnotationObject *ann = (AnnotationObject *) annotation;
+    if ([ann routeType] && [[ann routeType]isKindOfClass:[NSNumber class]])
+    {
+        if ([[ann routeType]isEqualToNumber:[NSNumber numberWithInt:99]] && [ann stop_id])
+        {
+            CustomButton* rightButton = [CustomButton buttonWithType:UIButtonTypeDetailDisclosure];
+            
+            rightButton.tag = [ann.stop_id integerValue];   // this code is the stop_id in the stop_times sheet
+            rightButton.string = ann.stop_code;
+            [rightButton addTarget:self
+                            action:@selector(mapButtonMoreInfo:)
+                  forControlEvents:UIControlEventTouchUpInside];
+            
+            view.rightCalloutAccessoryView = rightButton;
+            view.canShowCallout = YES;
+        }
+    }
+    
     return view;
 }//end mapView viewForAnnotation
 
 - (void)generateAnnotationsForVehicles
 {
+    [self removeMapButtonInfo];
+    [self displayUserLocationOnMap];
+    
+    // deleting all annotations
+    [mapView removeAnnotations:mapView.annotations];
+    
     // This will use the NSArray *arrayOfRoutesEnabled as it's data source
     // This arrayOfRoutesEnabled gets reloaded every time this viewWillAppear
     dispatch_queue_t downloader = dispatch_queue_create("downloader", NULL);
     dispatch_async(downloader, ^{
-        
-        // deleting all annotations
-        [mapView removeAnnotations:mapView.annotations];
         
         // I have an array of route short names (this gives us the 703 number) that need to be downloaded
         // Download each route per each route short name
@@ -135,6 +249,7 @@
             NSMutableArray *locationOfVehiclesForRoute = [self downloadLocationOfVehiclesForRouteShortName:route.routeShortName routeType:route.routeType];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [mapView addAnnotations:locationOfVehiclesForRoute];
+                
             });
         }
         // Repeat this for each route id
@@ -168,10 +283,9 @@
         vehicleObject.routeShortName = [[vehicle publishedLineName_arr]objectAtIndex:i];
         
         
+        // this is for the bus/train annotations
         for (Stop *stop in allStops)
         {
-//            NSLog(@"stopCode = %@", stop.stopCode);
-//            NSLog(@"destination = %@", [[vehicle destinationRef_arr]objectAtIndex:i]);
             if ([stop.stopCode isEqual:[[vehicle destinationRef_arr]objectAtIndex:i]])
             {
                 location.latitude = [stop.stopLatitude doubleValue];
@@ -183,6 +297,9 @@
                 annotation.title = [NSString stringWithFormat:@"%@", destinationAsString];
                 
                 annotation.routeType = [NSNumber numberWithInt:99];
+
+                annotation.stop_id = stop.stopId;
+                annotation.stop_code = stop.stopCode;
                 
                 [annotationArray addObject:annotation];
             }
@@ -212,6 +329,7 @@
     
     for (int i = 0; i < [stopPointRef count]; i++)
     {
+        // this is for the stop annotations
         for (Stop *stop in allStops)
         {
             if ([stop.stopId integerValue] == [[stopPointRef objectAtIndex:i]integerValue])
@@ -225,6 +343,8 @@
                 annotation.title = [NSString stringWithFormat:@"%@", destinationAsString];
                 
                 annotation.routeType = [NSNumber numberWithInt:99];
+                annotation.stop_id = stop.stopId;
+                annotation.stop_code = stop.stopCode;
                 
                 [annotationArray addObject:annotation];
 
@@ -237,7 +357,6 @@
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     return annotationArray;
 }
-
 
 #pragma mark - iAd
 -(void) bannerViewDidLoadAd:(ADBannerView *)banner

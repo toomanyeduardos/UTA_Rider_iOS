@@ -7,6 +7,7 @@
 //
 
 #import "SettingsTableViewController.h"
+#import "Utilities.h"
 
 @interface SettingsTableViewController ()
 
@@ -21,6 +22,12 @@
         // Custom initialization
     }
     return self;
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [Utilities reportPageOpenToAnalytics:NSStringFromClass([self class])];
 }
 
 - (void)viewDidLoad

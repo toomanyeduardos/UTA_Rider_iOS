@@ -38,100 +38,92 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-        
+    
     // Fixed the table going under the status bar by going to the storyboard
     // then selecting the tableview and modifing the "Top Content insets" to 20 from 0
-    
-    [self startGeolocation];
-
-    arrayOfRoutesEnabled = [[NSMutableArray alloc]init];
 }
 
--(void)awakeFromNib
+-(void)viewDidAppear:(BOOL)animated
 {
-    defaults = [NSUserDefaults standardUserDefaults];
-
-    [self parseStopsCSVFile];
-    [self parseRoutesCSVFile];
+    [super viewDidAppear:animated];
+    [Utilities reportPageOpenToAnalytics:NSStringFromClass([self class])];
 }
 
-- (void) parseStopsCSVFile
+- (void)viewWillAppear:(BOOL)animated
 {
-    NSArray *rowsArray = [Utilities parseCSVFileWithFileName:@"stops" fileType:@"csv"];
-    allStops = [[NSMutableArray alloc]init];
+    [super viewWillAppear:animated];
     
-    for (NSArray *obj in rowsArray)
+//    BOOL isFavoritesUpdated = [defaults boolForKey:KEY_FAVORITES_UPDATED];
+    NSData *routesFavoriteData = [defaults objectForKey:KEY_ROUTES_FAVORITE];
+    self.arrayOfFavoriteRoutes = [[NSMutableArray alloc]initWithArray:[NSKeyedUnarchiver unarchiveObjectWithData:routesFavoriteData]];
+    
+    if (self.arrayOfFavoriteRoutes && self.allRoutes)
     {
-        NSNumber *stop_id = [obj objectAtIndex:0];
-        NSString *stop_code = [obj objectAtIndex:1];
-        NSString *stop_name = [obj objectAtIndex:2];
-        NSString *stop_description = [obj objectAtIndex:3];
-        NSNumber *stop_latitude = [obj objectAtIndex:4];
-        NSNumber *stop_longitude = [obj objectAtIndex:5];
-        
-        Stop *singleStop = [[Stop alloc]init];
-        singleStop.stopId = stop_id;
-        singleStop.stopCode = stop_code;
-        singleStop.stopName = stop_name;
-        singleStop.stopDescription = stop_description;
-        singleStop.stopLatitude = stop_latitude;
-        singleStop.stopLongitude = stop_longitude;
-        
-        [allStops addObject:singleStop];
-    }
-    
-    // need to serialize allStops first
-    NSArray *arrayOfAllStops = [NSArray arrayWithArray:allStops];
-    NSData *data = [[NSData alloc]init];
-    data = [NSKeyedArchiver archivedDataWithRootObject:arrayOfAllStops];
-    [defaults setObject:data forKey:@"allStops"];
-}
-
-- (void) parseRoutesCSVFile
-{
-    NSArray *rowsArray = [Utilities parseCSVFileWithFileName:@"routes" fileType:@"csv"];
-    allRoutes = [[NSMutableArray alloc]init];
-    
-    for (NSArray *obj in rowsArray)
-    {
-        NSNumber *route_id = [obj objectAtIndex:0];
-        NSString *route_short_name = [obj objectAtIndex:2];
-        NSString *route_long_name = [obj objectAtIndex:3];
-        NSNumber *route_type = [obj objectAtIndex:5];
-        
-        Route *singleRoute = [[Route alloc]init];
-        singleRoute.routeId = route_id;
-        singleRoute.routeLongName = route_long_name;
-        singleRoute.routeShortName = route_short_name;
-        singleRoute.routeType = route_type;
-        
-        [allRoutes addObject:singleRoute];
-    }
-    
-    // create an array for each route type
-    routes_bus = [[NSMutableArray alloc]init];
-    routes_frontrunner = [[NSMutableArray alloc]init];
-    routes_trax = [[NSMutableArray alloc]init];
-    
-    for (Route *eachRoute in allRoutes)
-    {
-        int routeType = [[eachRoute routeType]integerValue];
-        
-        switch (routeType)
+        for (Route *eachRoute in self.allRoutes)
         {
-            case 0:
-                [routes_trax addObject:eachRoute];
-                break;
-            case 1:
-                break;
-            case 2:
-                [routes_frontrunner addObject:eachRoute];
-                break;
-            case 3:
-                [routes_bus addObject:eachRoute];
-                break;
+            [eachRoute setIsFavoriteRoute:NO];
+        }
+        
+        for (Route *routeFavorite in self.arrayOfFavoriteRoutes)
+        {
+//            NSLog(@"favorite route = %@", routeFavorite.routeId);
+            for (Route *eachRoute in self.allRoutes)
+            {
+                if (routeFavorite.routeId == eachRoute.routeId)
+                {
+                    [eachRoute setIsFavoriteRoute:YES];
+                }
+            }
         }
     }
+    
+    [self.tableView reloadData];
+}
+
+- (IBAction)onFavoriteSelected:(id)sender
+{
+    UIButton *buttonFavorite = sender;
+    long tag = buttonFavorite.tag;
+    BOOL routeDeleted = NO;
+    
+    if (self.arrayOfFavoriteRoutes)
+    {
+        for (Route *routeFavorite in self.arrayOfFavoriteRoutes)
+        {
+            if (tag == [routeFavorite.routeId longLongValue])
+            {
+                [self.arrayOfFavoriteRoutes removeObject:routeFavorite];
+                [buttonFavorite setImage:[UIImage imageNamed:@"star-empty"] forState:UIControlStateNormal];
+                routeDeleted = YES;
+                break;
+            }
+        }
+    }
+    
+    if (!routeDeleted)
+    {
+        for (Route *route in self.allRoutes)
+        {
+            if (tag == [route.routeId integerValue])
+            {
+                if (!self.arrayOfFavoriteRoutes)
+                {
+                    self.arrayOfFavoriteRoutes = [[NSMutableArray alloc]init];
+                }
+                [self.arrayOfFavoriteRoutes addObject:route];
+                break;
+            }
+        }
+        [buttonFavorite setImage:[UIImage imageNamed:@"star_selected"] forState:UIControlStateNormal];
+    }
+    
+    
+    // need to serialize arrayOfFavoriteRoutes first
+    NSArray *arrayOfFavoriteRoutesRegularArray = [NSArray arrayWithArray:self.arrayOfFavoriteRoutes];
+    NSData *data = [[NSData alloc]init];
+    data = [NSKeyedArchiver archivedDataWithRootObject:arrayOfFavoriteRoutesRegularArray];
+    [defaults setObject:data forKey:KEY_ROUTES_FAVORITE];
+    [defaults synchronize];
 }
 
 #pragma mark - Table view data source
@@ -148,13 +140,13 @@
     switch (section)
     {
         case 0:
-            return [routes_trax count];
+            return [self.routes_trax count];
             break;
         case 1:
-            return [routes_frontrunner count];
+            return [self.routes_frontrunner count];
             break;
         case 2:
-            return [routes_bus count];
+            return [self.routes_bus count];
             break;
     }
     return 0;
@@ -190,130 +182,56 @@
     switch (indexPath.section)
     {
         case 0:
-            singleRoute = [routes_trax objectAtIndex:indexPath.row];
+            singleRoute = [self.routes_trax objectAtIndex:indexPath.row];
             cell.label_routeName.text = singleRoute.routeLongName;
             cell.label_routeDetail.text = singleRoute.routeShortName;
             cell.switch_routeSwitch.tag = [singleRoute.routeId integerValue];
-            [cell.switch_routeSwitch setOn:singleRoute.getIsEnabled];
+            cell.buttonFavoriteAsOutlet.tag = [singleRoute.routeId integerValue];
+            [cell.switch_routeSwitch setOn:singleRoute.isEnabled];
+            if (singleRoute.isFavoriteRoute)
+            {
+                [cell.buttonFavoriteAsOutlet setImage:[UIImage imageNamed:@"star_selected"] forState:UIControlStateNormal];
+            }
+            else
+            {
+                [cell.buttonFavoriteAsOutlet setImage:[UIImage imageNamed:@"star-empty"] forState:UIControlStateNormal];
+            }
             break;
         case 1:
-            singleRoute = [routes_frontrunner objectAtIndex:indexPath.row];
+            singleRoute = [self.routes_frontrunner objectAtIndex:indexPath.row];
             cell.label_routeName.text = singleRoute.routeLongName;
             cell.label_routeDetail.text = singleRoute.routeShortName;
             cell.switch_routeSwitch.tag = [singleRoute.routeId integerValue];
-            [cell.switch_routeSwitch setOn:singleRoute.getIsEnabled];
+            cell.buttonFavoriteAsOutlet.tag = [singleRoute.routeId integerValue];
+            [cell.switch_routeSwitch setOn:singleRoute.isEnabled];
+            if (singleRoute.isFavoriteRoute)
+            {
+                [cell.buttonFavoriteAsOutlet setImage:[UIImage imageNamed:@"star_selected"] forState:UIControlStateNormal];
+            }
+            else
+            {
+                [cell.buttonFavoriteAsOutlet setImage:[UIImage imageNamed:@"star-empty"] forState:UIControlStateNormal];
+            }
             break;
         case 2:
-            singleRoute = [routes_bus objectAtIndex:indexPath.row];
+            singleRoute = [self.routes_bus objectAtIndex:indexPath.row];
             cell.label_routeName.text = singleRoute.routeLongName;
             cell.label_routeDetail.text = singleRoute.routeShortName;
             cell.switch_routeSwitch.tag = [singleRoute.routeId integerValue];
-            [cell.switch_routeSwitch setOn:singleRoute.getIsEnabled];
+            cell.buttonFavoriteAsOutlet.tag = [singleRoute.routeId integerValue];
+            [cell.switch_routeSwitch setOn:singleRoute.isEnabled];
+            if (singleRoute.isFavoriteRoute)
+            {
+                [cell.buttonFavoriteAsOutlet setImage:[UIImage imageNamed:@"star_selected"] forState:UIControlStateNormal];
+            }
+            else
+            {
+                [cell.buttonFavoriteAsOutlet setImage:[UIImage imageNamed:@"star-empty"] forState:UIControlStateNormal];
+            }
             break;
     }
     return cell;
 }
-
-- (IBAction)switchEnableRoute:(id)sender
-{
-    UISwitch *switchInCell = sender;
-    
-    //NSLog(@"on? = %d", [switchInCell isOn]);
-    //NSLog(@"switch tag = %d", switchInCell.tag);
-    
-    // take the tag of the array
-    int tag = switchInCell.tag;
-    
-    // check to see if the arrayOfRoutesEnabled has this selected route in the array
-    for (Route *route in allRoutes)
-    {
-        if (tag == [route.routeId integerValue])
-        {
-            // if the route is not in the array it means that the route hasn't been selected yet
-            // add route to array and set value of isEnabled to yes
-            if ( ![self isRouteInArrayOfRoutesEnabled:route])
-            {
-                [arrayOfRoutesEnabled addObject:route];
-                [route setIsEnabled:YES];
-            }
-            else    // remove route from array and set isEnabled value to no
-            {
-                [arrayOfRoutesEnabled removeObject:route];
-                [route setIsEnabled:NO];
-            }
-        }
-    }
-    
-    // need to serialize setObject:arrayOfRoutesEnabled first
-    NSArray *routesEnabledAsRegularArray = [NSArray arrayWithArray:arrayOfRoutesEnabled];
-    NSData *data = [[NSData alloc]init];
-    data = [NSKeyedArchiver archivedDataWithRootObject:routesEnabledAsRegularArray];
-    [defaults setObject:data forKey:@"arrayOfRoutesEnabled"];
-    
-}
-
-- (BOOL) isRouteInArrayOfRoutesEnabled:(Route *)routeParameter
-{
-    for (Route *route in arrayOfRoutesEnabled)
-    {
-        if (route == routeParameter)
-            return YES;
-    }
-    return NO;
-}
-
-#pragma mark - Geolocation Methods
-- (void) startGeolocation
-{
-    locationManager = [[CLLocationManager alloc]init];
-    
-    BOOL locationAllowed = [CLLocationManager locationServicesEnabled];
-    if (locationAllowed)
-    {
-        if([CLLocationManager authorizationStatus]==kCLAuthorizationStatusDenied)
-        {
-            
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"App Permission Denied"
-                                                            message:@"Location services are enabled on this device, but this app is not allowed to us them"
-                                                           delegate:nil
-                                                  cancelButtonTitle:@"OK"
-                                                  otherButtonTitles:nil];
-            [alert show];
-        }
-        else
-        {
-            geocoder = [[CLGeocoder alloc] init];
-            
-            [locationManager setDelegate:self];
-            
-            [locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
-            [locationManager setDistanceFilter:50];
-            
-            [locationManager startUpdatingLocation];
-        }
-    }
-}
-
-- (void) locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
-{
-    CLLocation *currentLocation = newLocation;
-    
-    NSString *latitude = [NSString stringWithFormat:@"%f", currentLocation.coordinate.latitude];
-    NSString *longitude = [NSString stringWithFormat:@"%f", currentLocation.coordinate.longitude];
-//    NSLog(@"latitude = %@", latitude);
-//    NSLog(@"longitude = %@", longitude);
-    
-    [defaults setObject:latitude forKey:@"latitude"];
-    [defaults setObject:longitude forKey:@"longitude"];
-    
-    [locationManager stopUpdatingLocation];
-}
-
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
-{
-    NSLog(@"Error locationManager = %@", error);
-}
-
 
 @end
 

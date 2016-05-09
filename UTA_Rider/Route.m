@@ -9,7 +9,7 @@
 #import "Route.h"
 
 @implementation Route
-@synthesize routeId, routeLongName, routeShortName, routeType;
+@synthesize routeId, routeLongName, routeShortName, routeType, isFavoriteRoute, isEnabled;
 
 // Need to serialize this object to put it in nsuserdefaults
 - (void)encodeWithCoder:(NSCoder *)aCoder
@@ -18,6 +18,7 @@
     [aCoder encodeObject:routeLongName forKey:@"routeLongName"];
     [aCoder encodeObject:routeShortName forKey:@"routeShortName"];
     [aCoder encodeObject:routeType forKey:@"routeType"];
+    [aCoder encodeBool:isFavoriteRoute forKey:@"isFavoriteRoute"];
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
@@ -28,19 +29,9 @@
     self.routeLongName = [aDecoder decodeObjectForKey:@"routeLongName"];
     self.routeShortName = [aDecoder decodeObjectForKey:@"routeShortName"];
     self.routeType = [aDecoder decodeObjectForKey:@"routeType"];
+    self.isFavoriteRoute = [aDecoder decodeBoolForKey:@"isFavoriteRoute"];
     
     return self;
-}
-
-// Methods to know if route has been selected
-- (void)setIsEnabled:(BOOL)value
-{
-    isEnabled = value;
-}
-
-- (BOOL)getIsEnabled
-{
-    return isEnabled;
 }
 
 @end

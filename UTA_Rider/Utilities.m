@@ -7,6 +7,8 @@
 //
 
 #import "Utilities.h"
+#import <Parse/Parse.h>
+#import "Route.h"
 
 @implementation Utilities
 
@@ -20,8 +22,10 @@
     NSArray *parsingRows = [content componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     
     NSMutableArray *rowsArray = [[NSMutableArray alloc]init];
-    for (NSString *singleLine in parsingRows)
+//    for (NSString *singleLine in parsingRows)
+    for (int i = 1; i < [parsingRows count]; i++)
     {
+        NSString *singleLine = [parsingRows objectAtIndex:i];
         if (![singleLine isEqualToString:@""])
         {
             NSArray *singleLineArray = [singleLine componentsSeparatedByString:@","];
@@ -33,4 +37,84 @@
     return array;
 }
 
++ (void)reportPageOpenToAnalytics:(NSString *)nameOfViewController
+{
+    NSDictionary *dimensions = @{@"ViewController": nameOfViewController};
+    [PFAnalytics trackEventInBackground:@"PAGE" dimensions:dimensions
+                                  block:^(BOOL succeeded, NSError * _Nullable error) {
+                                      if (!error)
+                                      {
+                                          //NSLog(@"analytics from class %@ succeeded!", nameOfViewController);
+                                      }
+                                  }];
+}
+
++(void)reportRoutesEnabledToAnalytics:(NSArray *)arrayOfRoutesEnabled
+{
+    NSMutableDictionary *dimensions = [[NSMutableDictionary alloc]init];
+    
+    for (int i = 0; i < [arrayOfRoutesEnabled count]; i++)
+    {
+        NSString *key = [NSString stringWithFormat:@"RouteShortName_%d", i];
+        Route *route = [arrayOfRoutesEnabled objectAtIndex:i];
+        [dimensions setValue:[route routeShortName] forKey:key];
+    }
+    
+    [PFAnalytics trackEventInBackground:@"ROUTES"
+                             dimensions:dimensions
+                                  block:^(BOOL succeeded, NSError * _Nullable error) {
+        if (!error)
+        {
+            //NSLog(@"routes reported!");
+        }
+    }];
+}
+
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
